@@ -332,10 +332,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _boids: []
   _boidPrefab: {fileID: 6395801916619647039, guid: 76a53096619f83d4893c1365013dd7a0, type: 3}
-  _boidCount: 100
-  _spawnFieldHeight: 7
-  _spawnFieldWidth: 7
-  _spawnFieldDepth: 7
+  _boidCount: 200
+  _spawnFieldHeight: 10
+  _spawnFieldWidth: 10
+  _spawnFieldDepth: 10
+  _separationFactor: 1
+  _alignmentFactor: 1
+  _cohesionFactor: 1
+  _turnSpeed: 1.5
+  _boidRegionScale: 0.2
 --- !u!4 &992359767
 Transform:
   m_ObjectHideFlags: 0
