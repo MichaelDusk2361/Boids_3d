@@ -74,9 +74,10 @@ public class BoidsController : MonoBehaviour
                 if (_boidRegions[boid.BoidRegion].Count == 0)
                     _boidRegions.Remove(boid.BoidRegion);
             }
-
+        
         if (!_boidRegions.ContainsKey(boidRegion))
             _boidRegions.Add(boidRegion, new());
+
         _boidRegions[boidRegion].Add(boid);
         return boidRegion;
     }
