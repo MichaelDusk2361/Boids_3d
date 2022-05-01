@@ -7,8 +7,6 @@ public class Boid : MonoBehaviour
 {
     BoidsController _boidsController;
     [SerializeField] float _speed = 5;
-    Vector3 _boidRegion = Vector3.positiveInfinity;
-    public Vector3 BoidRegion { get => _boidRegion; private set => _boidRegion = value; }
 
     internal void Init(BoidsController boidsController)
     {
@@ -17,13 +15,11 @@ public class Boid : MonoBehaviour
 
     private void Update()
     {
-        _boidRegion = _boidsController.UpdateBoidRegion(this);
         transform.Translate(_speed * Time.deltaTime * Vector3.forward);
-        //transform.rotation = Quaternion.LookRotation(_boidsController.targetDirection);
         Vector3 separationTarget = Vector3.zero;
         Vector3 alignmentTarget = Vector3.zero;
         Vector3 cohesionPosition = Vector3.zero;
-        foreach (var boid in _boidsController.BoidRegions[_boidRegion])
+        foreach (var boid in _boidsController.Boids)
         {
             if (boid != this)
             {
@@ -32,7 +28,7 @@ public class Boid : MonoBehaviour
                 separationTarget += (transform.position - boid.transform.position).normalized * 1 / Vector3.Distance(transform.position, boid.transform.position);
             }
         }
-        int boidCount = _boidsController.BoidRegions[_boidRegion].Count;
+        int boidCount = _boidsController.Boids.Count;
         if (boidCount > 1)
         {
             alignmentTarget /= boidCount - 1;
