@@ -9,37 +9,11 @@ public class Boid : MonoBehaviour
 {
     BoidsController _boidsController;
     [SerializeField] float _speed = 5;
-    Vector3 velocity;
-    [SerializeField] float _mass = 1;
-    [SerializeField] float _maxSeparationVelocity = 1;
-    [SerializeField] float _maxAlginmentVelocity = 1;
-    [SerializeField] float _maxCohesionVelocity = 1;
-    [SerializeField] float _maxForce = 1;
-    [SerializeField] float _maxSpeed = 1;
-    [SerializeField] float _range = 1;
-    [SerializeField] float _fovDeg = 270;
 
     internal void Init(
-        BoidsController boidsController,
-        float mass,
-        float maxSeparationVelocity,
-        float maxAlginmentVelocity,
-        float maxCohesionVelocity,
-        float maxForce,
-        float maxSpeed,
-        float range,
-        float fovDeg)
+        BoidsController boidsController)
     {
-        velocity = transform.forward * maxSpeed;
         _boidsController = boidsController;
-        _mass = mass;
-        _maxSeparationVelocity = maxSeparationVelocity;
-        _maxAlginmentVelocity = maxAlginmentVelocity;
-        _maxCohesionVelocity = maxCohesionVelocity;
-        _maxForce = maxForce;
-        _maxSpeed = maxSpeed;
-        _range = range;
-        _fovDeg = fovDeg;
     }
     List<Vector3> _targetVectorParts = new();
     List<Vector3> _separationVectorParts = new();
@@ -99,27 +73,4 @@ public class Boid : MonoBehaviour
                                 Quaternion.LookRotation(targetVector),
                                 Time.deltaTime * _boidsController.TurnSpeed);
     }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.gray;
-        Gizmos.DrawWireSphere(transform.position, _range);
-    }
-    //private void LateUpdate()
-    //{
-    //    velocity = Vector3.ClampMagnitude(velocity + steering, _maxSpeed);
-    //    //Vector3 targetVector =
-    //    //    (cohesionTarget - transform.position) * _boidsController.CohesionFactor +
-    //    //    separationTarget * _boidsController.SeparationFactor +
-    //    //    alignmentTarget * _boidsController.AlignmentFactor;
-
-    //    //if (targetVector == Vector3.zero)
-    //    //    targetVector = Vector3.forward;
-    //    transform.rotation = Quaternion.LookRotation(velocity);
-    //    transform.position += Time.deltaTime * velocity;
-    //    //transform.rotation = Quaternion.Lerp(
-    //    //                        transform.rotation,
-    //    //                        Quaternion.LookRotation(velocity),
-    //    //                        Time.deltaTime * _boidsController.TurnSpeed);
-    //}
 }

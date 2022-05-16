@@ -56,7 +56,7 @@ public class BoidsController : MonoBehaviour
                 Random.Range(-_spawnFieldHeight / 2f, _spawnFieldHeight / 2f),
                 Random.Range(-_spawnFieldDepth / 2f, _spawnFieldDepth / 2f));
             Boid newBoid = Instantiate(_boidPrefab, randomPostion + transform.position, Random.rotation).GetComponent<Boid>();
-            newBoid.Init(this, _mass, _maxSeparationVelocity, _maxAlginmentVelocity, _maxCohesionVelocity, _maxForce, _maxSpeed, _range, _fovDeg);
+            newBoid.Init(this);
             _boids.Add(newBoid);
         }
     }
