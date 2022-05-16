@@ -11,16 +11,16 @@ public class BoidsController : MonoBehaviour
     [SerializeField] int _spawnFieldHeight = 10;
     [SerializeField] int _spawnFieldWidth = 10;
     [SerializeField] int _spawnFieldDepth = 10;
-    [SerializeField] private float _separationFactor = 1;
-    [SerializeField] private float _alignmentFactor = 1;
-    [SerializeField] private float _cohesionFactor = 1;
-    [SerializeField] private float _turnSpeed = 1;
+    [SerializeField] float _mass = 1;
+    [SerializeField] float _maxSeparationVelocity = 1;
+    [SerializeField] float _maxAlginmentVelocity = 1;
+    [SerializeField] float _maxCohesionVelocity = 1;
+    [SerializeField] float _maxForce = 1;
+    [SerializeField] float _maxSpeed = 1;
+    [SerializeField] float _range = 1;
+    [SerializeField] float _fovDeg = 270;
 
     public List<Boid> Boids { get => _boids; }
-    public float SeparationFactor { get => _separationFactor; }
-    public float AlignmentFactor { get => _alignmentFactor; }
-    public float CohesionFactor { get => _cohesionFactor; }
-    public float TurnSpeed { get => _turnSpeed; }
 
     private void OnValidate()
     {
@@ -48,8 +48,12 @@ public class BoidsController : MonoBehaviour
                 Random.Range(-_spawnFieldHeight / 2f, _spawnFieldHeight / 2f),
                 Random.Range(-_spawnFieldDepth / 2f, _spawnFieldDepth / 2f));
             Boid newBoid = Instantiate(_boidPrefab, randomPostion + transform.position, Random.rotation).GetComponent<Boid>();
-            newBoid.Init(this);
+            newBoid.Init(this, _mass, _maxSeparationVelocity, _maxAlginmentVelocity, _maxCohesionVelocity, _maxForce, _maxSpeed, _range, _fovDeg);
             _boids.Add(newBoid);
         }
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(transform.position, new Vector3(_spawnFieldWidth, _spawnFieldHeight, _spawnFieldDepth));
     }
 }

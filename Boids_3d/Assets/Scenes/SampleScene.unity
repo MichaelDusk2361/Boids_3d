@@ -332,14 +332,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _boids: []
   _boidPrefab: {fileID: 6395801916619647039, guid: 76a53096619f83d4893c1365013dd7a0, type: 3}
-  _boidCount: 100
-  _spawnFieldHeight: 10
-  _spawnFieldWidth: 10
-  _spawnFieldDepth: 10
-  _separationFactor: 2
-  _alignmentFactor: 1
-  _cohesionFactor: 8
-  _turnSpeed: 1.5
+  _boidCount: 31
+  _spawnFieldHeight: 5
+  _spawnFieldWidth: 5
+  _spawnFieldDepth: 5
+  _mass: 1
+  _maxSeparationVelocity: 1.45
+  _maxAlginmentVelocity: 0.63
+  _maxCohesionVelocity: 1.15
+  _maxForce: 0.76
+  _maxSpeed: 2.69
+  _range: 5.67
+  _fovDeg: 300
 --- !u!4 &992359767
 Transform:
   m_ObjectHideFlags: 0
