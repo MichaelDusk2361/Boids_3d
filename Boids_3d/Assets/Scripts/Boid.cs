@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using Random = UnityEngine.Random;
 
 public class Boid : MonoBehaviour
 {
@@ -39,72 +41,63 @@ public class Boid : MonoBehaviour
         _range = range;
         _fovDeg = fovDeg;
     }
-
+    List<Vector3> _targetVectorParts = new();
+    List<Vector3> _separationVectorParts = new();
+    List<Vector3> _alignmentVectorParts = new();
+    List<Vector3> _cohesionVectorParts = new();
     private void Update()
     {
-        velocity = transform.forward * _maxSpeed;
-        Vector3 separationTarget = Vector3.zero;
-        Vector3 alignmentTarget = Vector3.zero;
-        Vector3 cohesionTarget = Vector3.zero;
-        int boidsInRangeCount = 0;
+        _separationVectorParts.Clear();
+        _alignmentVectorParts.Clear();
+        _cohesionVectorParts.Clear();
+        _targetVectorParts.Clear();
+        transform.Translate(_speed * Time.deltaTime * Vector3.forward);
         foreach (var boid in _boidsController.Boids)
         {
-            if (boid != this &&
-                Vector3.Distance(boid.transform.position, transform.position) < _range &&
-                Vector3.Angle(velocity, boid.transform.position - transform.position) < _fovDeg / 2)
+
+            if (boid != this && Vector3.Angle(transform.forward, boid.transform.forward) < _boidsController.FovDeg / 2)
             {
-                boidsInRangeCount++;
-                cohesionTarget += boid.transform.position;
-                alignmentTarget += boid.velocity.normalized;
-                separationTarget += (transform.position - boid.transform.position).normalized * 1 / Vector3.Distance(transform.position, boid.transform.position);
+                float distance = Vector3.Distance(boid.transform.position, transform.position);
+                if (distance < _boidsController.CohesionRange)
+                    _cohesionVectorParts.Add(boid.transform.position);
+                if (distance < _boidsController.AlignmentRange)
+                    _alignmentVectorParts.Add(boid.transform.forward);
+                if (distance < _boidsController.SeparationRange)
+                    _separationVectorParts.Add((transform.position - boid.transform.position).normalized * 1 / Vector3.Distance(transform.position, boid.transform.position));
             }
         }
-        if (boidsInRangeCount > 0)
+        Vector3 alignmentTarget = Vector3.zero;
+        _alignmentVectorParts.ForEach(v => alignmentTarget += v);
+        Vector3 cohesionTarget = Vector3.zero;
+        _cohesionVectorParts.ForEach(v => cohesionTarget += v);
+        Vector3 separationTarget = Vector3.zero;
+        _separationVectorParts.ForEach(v => separationTarget += v);
+
+        if (alignmentTarget != Vector3.zero)
         {
-            cohesionTarget /= boidsInRangeCount;
+            alignmentTarget = alignmentTarget.normalized;
+            alignmentTarget = (alignmentTarget - Vector3.Dot(transform.forward, alignmentTarget) * transform.forward).normalized;
+            _targetVectorParts.Add(alignmentTarget * _boidsController.AlignmentFactor);
+        }
+        if (cohesionTarget != Vector3.zero)
+        {
+            cohesionTarget /= _cohesionVectorParts.Count;
             cohesionTarget -= transform.position;
+            _targetVectorParts.Add(cohesionTarget * _boidsController.CohesionFactor);
+        }
+        if(separationTarget != Vector3.zero)
+        {
+            _targetVectorParts.Add(separationTarget * _boidsController.SeparationFactor);
         }
 
-        Debug.DrawRay(transform.position, velocity, Color.white);
-        Vector3 separationVelocity = Vector3.zero;
-        Vector3 alignmentVelocity = Vector3.zero;
-        Vector3 cohesionVelocity = Vector3.zero;
-        if (separationTarget != Vector3.zero)
-            separationVelocity = separationTarget.normalized * _maxSeparationVelocity;
-        if (alignmentTarget != Vector3.zero)
-            alignmentVelocity = alignmentTarget.normalized * _maxAlginmentVelocity;
-        if (cohesionTarget != Vector3.zero)
-            cohesionVelocity = cohesionTarget.normalized * _maxCohesionVelocity;
-
-        Vector3 separationForce = Vector3.zero;
-        Vector3 alignmentForce = Vector3.zero;
-        Vector3 cohesionForce = Vector3.zero;
-        if (separationVelocity != Vector3.zero)
-            separationForce = separationVelocity - velocity;
-        if (alignmentVelocity != Vector3.zero)
-            alignmentForce = alignmentVelocity - velocity;
-        if (cohesionVelocity != Vector3.zero)
-            cohesionForce = cohesionVelocity - velocity;
-        Debug.DrawRay(transform.position, separationVelocity, Color.magenta);
-        Debug.DrawRay(transform.position + velocity, separationForce, Color.magenta);
-        Debug.DrawRay(transform.position, alignmentVelocity, Color.cyan);
-        Debug.DrawRay(transform.position + velocity, alignmentForce, Color.cyan);
-        Debug.DrawRay(transform.position, cohesionVelocity, Color.yellow);
-        Debug.DrawRay(transform.position + velocity, cohesionForce, Color.yellow);
-        Vector3 steering = Vector3.zero;
-        if (separationForce != Vector3.zero)
-            steering += separationForce;
-        if (cohesionForce != Vector3.zero)
-            steering += cohesionForce;
-        if (alignmentForce != Vector3.zero)
-            steering += alignmentForce;
-
-        steering = Vector3.ClampMagnitude(steering, _maxForce) * _mass;
-        Debug.DrawRay(transform.position, steering, Color.black);
-        if (steering != Vector3.zero)
-            velocity = Vector3.ClampMagnitude(velocity + steering, _maxSpeed);
-        transform.rotation = Quaternion.LookRotation(velocity);
-        transform.position += Time.deltaTime * velocity;
+        Vector3 targetVector = Vector3.zero;
+        _targetVectorParts.ForEach(v => targetVector += v);
+        if (targetVector == Vector3.zero)
+            targetVector = transform.forward;
+        transform.rotation = Quaternion.Lerp(
+                                transform.rotation,
+                                Quaternion.LookRotation(targetVector),
+                                Time.deltaTime * _boidsController.TurnSpeed);
     }
 
     private void OnDrawGizmos()
