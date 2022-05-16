@@ -293,14 +293,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.258819, y: 0, z: 0, w: 0.9659259}
   m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -30, y: 0, z: 0}
 --- !u!1 &992359765
 GameObject:
   m_ObjectHideFlags: 0
@@ -332,14 +332,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _boids: []
   _boidPrefab: {fileID: 6395801916619647039, guid: 76a53096619f83d4893c1365013dd7a0, type: 3}
-  _boidCount: 100
+  _boidCount: 200
   _spawnFieldHeight: 10
   _spawnFieldWidth: 10
   _spawnFieldDepth: 10
   _separationFactor: 2
   _alignmentFactor: 1
   _cohesionFactor: 8
+  _separationRange: 12
+  _alignmentRange: 5
+  _cohesionRange: 10
   _turnSpeed: 1.5
+  _fovDeg: 200.5
 --- !u!4 &992359767
 Transform:
   m_ObjectHideFlags: 0

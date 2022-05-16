@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using Random = UnityEngine.Random;
 
 public class Boid : MonoBehaviour
 {
@@ -12,35 +14,59 @@ public class Boid : MonoBehaviour
     {
         _boidsController = boidsController;
     }
-
+    List<Vector3> _targetVectorParts = new();
+    List<Vector3> _separationVectorParts = new();
+    List<Vector3> _alignmentVectorParts = new();
+    List<Vector3> _cohesionVectorParts = new();
     private void Update()
     {
+        _separationVectorParts.Clear();
+        _alignmentVectorParts.Clear();
+        _cohesionVectorParts.Clear();
+        _targetVectorParts.Clear();
         transform.Translate(_speed * Time.deltaTime * Vector3.forward);
-        Vector3 separationTarget = Vector3.zero;
-        Vector3 alignmentTarget = Vector3.zero;
-        Vector3 cohesionPosition = Vector3.zero;
         foreach (var boid in _boidsController.Boids)
         {
-            if (boid != this)
+
+            if (boid != this && Vector3.Angle(transform.forward, boid.transform.forward) < _boidsController.FovDeg / 2)
             {
-                cohesionPosition += boid.transform.position;
-                alignmentTarget += boid.transform.forward;
-                separationTarget += (transform.position - boid.transform.position).normalized * 1 / Vector3.Distance(transform.position, boid.transform.position);
+                float distance = Vector3.Distance(boid.transform.position, transform.position);
+                if (distance < _boidsController.CohesionRange)
+                    _cohesionVectorParts.Add(boid.transform.position);
+                if (distance < _boidsController.AlignmentRange)
+                    _alignmentVectorParts.Add(boid.transform.forward);
+                if (distance < _boidsController.SeparationRange)
+                    _separationVectorParts.Add((transform.position - boid.transform.position).normalized * 1 / Vector3.Distance(transform.position, boid.transform.position));
             }
         }
-        int boidCount = _boidsController.Boids.Count;
-        if (boidCount > 1)
+        Vector3 alignmentTarget = Vector3.zero;
+        _alignmentVectorParts.ForEach(v => alignmentTarget += v);
+        Vector3 cohesionTarget = Vector3.zero;
+        _cohesionVectorParts.ForEach(v => cohesionTarget += v);
+        Vector3 separationTarget = Vector3.zero;
+        _separationVectorParts.ForEach(v => separationTarget += v);
+
+        if (alignmentTarget != Vector3.zero)
         {
-            alignmentTarget /= boidCount - 1;
+            alignmentTarget = alignmentTarget.normalized;
             alignmentTarget = (alignmentTarget - Vector3.Dot(transform.forward, alignmentTarget) * transform.forward).normalized;
-            cohesionPosition /= boidCount - 1;
+            _targetVectorParts.Add(alignmentTarget * _boidsController.AlignmentFactor);
         }
-        Vector3 targetVector =
-            (cohesionPosition - transform.position) * _boidsController.CohesionFactor +
-            separationTarget * _boidsController.SeparationFactor +
-            alignmentTarget * _boidsController.AlignmentFactor;
+        if (cohesionTarget != Vector3.zero)
+        {
+            cohesionTarget /= _cohesionVectorParts.Count;
+            cohesionTarget -= transform.position;
+            _targetVectorParts.Add(cohesionTarget * _boidsController.CohesionFactor);
+        }
+        if(separationTarget != Vector3.zero)
+        {
+            _targetVectorParts.Add(separationTarget * _boidsController.SeparationFactor);
+        }
+
+        Vector3 targetVector = Vector3.zero;
+        _targetVectorParts.ForEach(v => targetVector += v);
         if (targetVector == Vector3.zero)
-            targetVector = Vector3.forward;
+            targetVector = transform.forward;
         transform.rotation = Quaternion.Lerp(
                                 transform.rotation,
                                 Quaternion.LookRotation(targetVector),

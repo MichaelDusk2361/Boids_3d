@@ -14,13 +14,21 @@ public class BoidsController : MonoBehaviour
     [SerializeField] private float _separationFactor = 1;
     [SerializeField] private float _alignmentFactor = 1;
     [SerializeField] private float _cohesionFactor = 1;
+    [SerializeField] private float _separationRange = 5;
+    [SerializeField] private float _alignmentRange = 5;
+    [SerializeField] private float _cohesionRange = 5;
     [SerializeField] private float _turnSpeed = 1;
+    [SerializeField] private float _fovDeg = 270;
 
     public List<Boid> Boids { get => _boids; }
     public float SeparationFactor { get => _separationFactor; }
     public float AlignmentFactor { get => _alignmentFactor; }
     public float CohesionFactor { get => _cohesionFactor; }
     public float TurnSpeed { get => _turnSpeed; }
+    public float SeparationRange { get => _separationRange; }
+    public float AlignmentRange { get => _alignmentRange; }
+    public float CohesionRange { get => _cohesionRange; }
+    public float FovDeg { get => _fovDeg; set => _fovDeg = value; }
 
     private void OnValidate()
     {
